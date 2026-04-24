@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/video.js@8.23.4/dist/video-js.min.css"
+  integrity="sha384-7EhvnnsmFfBQmzyff3uFsStsUKyx5Qvh0P5TjPdZheUpELX9ER5CkgYHp1sxF02A" crossorigin="anonymous">
+{% endblock %}
+
+{% block content %}
+<section class="hero-panel rounded-4 p-4 p-lg-5 mb-4 text-white">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <span class="badge rounded-pill text-bg-light text-dark mb-3">Single-user IPTV hub</span>
+      <h1 class="display-6 fw-semibold mb-3">Browse your synced IPTV library from one unified catalog.</h1>
+      <p class="lead mb-0 text-white-50">Filter by source, category, or title search. Your saved results-per-page
+        setting controls how many matches appear at once.</p>
+    </div>
+    <div class="col-lg-5">
+      <div class="hero-stats card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="row text-center g-3">
+            <div class="col-4">
+              <div class="fs-3 fw-semibold" id="count-sources">0</div>
+              <div class="text-secondary small">Sources</div>
+            </div>
+            <div class="col-4">
+              <div class="fs-3 fw-semibold" id="count-categories">0</div>
+              <div class="text-secondary small">Categories</div>
+            </div>
+            <div class="col-4">
+              <div class="fs-3 fw-semibold" id="count-items">0</div>
+              <div class="text-secondary small">Visible items</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3 mb-3">
+      <div class="ms-lg-auto d-flex flex-column flex-md-row gap-2 w-100">
+        <select class="form-select" id="source-filter" aria-label="Source filter">
+          <option value="">All sources</option>
+        </select>
+        <select class="form-select" id="category-filter" aria-label="Category filter">
+          <option value="">All categories</option>
+        </select>
+        <input class="form-control" id="search-filter" type="search" placeholder="Search title">
+      </div>
+    </div>
+    <div class="alert alert-info d-none mb-0" id="library-message"></div>
+  </div>
+</section>
+
+<nav class="library-pagination mb-4 d-none" id="library-pagination-top" aria-label="Library pagination top"></nav>
+<div class="library-loading text-center py-4 d-none" id="library-loading">
+  <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+  <div class="small text-secondary mt-2">Fetching results from the server...</div>
+</div>
+<section class="row g-4" id="item-grid"></section>
+<nav class="library-pagination mt-4 d-none" id="library-pagination-bottom" aria-label="Library pagination bottom"></nav>
+
+<div class="modal fade" id="series-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title fs-4" id="series-modal-title">Series details</h2>
+          <p class="text-secondary mb-0" id="series-modal-subtitle"></p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info d-none" id="series-modal-message"></div>
+        <div class="list-group list-group-flush" id="series-episodes"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="player-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header d-flex">
+        <div class="min-w-0">
+          <span class="badge text-bg-primary player-modal-type mb-2" id="player-modal-type">Loading</span>
+          <h2 class="modal-title player-modal-title mb-1" id="player-modal-title">Preparing stream...</h2>
+          <p class="player-modal-subtitle mb-0" id="player-modal-subtitle"></p>
+        </div>
+        <div class="ms-auto gap-2 player-header-actions">
+          <button class="btn btn-outline-primary btn-sm" type="button" id="player-modal-copy-url" disabled>Copy
+            URL</button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="player-modal-shell mb-3">
+          <div class="player-surface rounded-4 overflow-hidden">
+            <div id="player-modal-video-host">
+              <button class="player-launch-button" type="button" id="player-modal-launch" disabled>
+                <span class="player-launch-icon" aria-hidden="true">▶</span>
+                <span class="player-launch-label">Loading stream details...</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <p class="text-secondary mb-3" id="player-modal-description">The app loads stream details first and only
+          requests the provider stream after you press play.</p>
+        <div class="player-link-box rounded-4 p-3 mb-3">
+          <label class="form-label small text-secondary mb-2" for="player-modal-stream-url">Direct stream URL</label>
+          <input class="form-control mb-2" id="player-modal-stream-url" type="text" readonly>
+        </div>
+        <div class="alert alert-info d-none mb-0" id="player-modal-message"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/video.js@8.23.4/dist/video.min.js"
+  integrity="sha384-GK0UA/tBku6A4JblKlmFXkAtBuKfr8BbYGvrdgqmSkNbVQ1M7VfSRCZO75VUS/O6" crossorigin="anonymous"></script>
+<script type="module" src="{{ url_for('static', filename='js/library.js') }}"></script>
+{% endblock %}

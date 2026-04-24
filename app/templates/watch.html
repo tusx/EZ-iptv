@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/video.js@8.23.4/dist/video-js.min.css"
+    integrity="sha384-7EhvnnsmFfBQmzyff3uFsStsUKyx5Qvh0P5TjPdZheUpELX9ER5CkgYHp1sxF02A"
+    crossorigin="anonymous"
+  >
+{% endblock %}
+
+{% block content %}
+  <section class="card border-0 shadow-sm overflow-hidden" data-item-id="{{ item_id }}" id="watch-view">
+    <div class="row g-0">
+      <div class="col-lg-8">
+        <div class="player-surface watch-player-surface">
+          <div id="watch-video-host">
+            <button class="player-launch-button" type="button" id="watch-launch" disabled>
+              <span class="player-launch-icon" aria-hidden="true">▶</span>
+              <span class="player-launch-label">Loading stream details...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="p-4 h-100 d-flex flex-column">
+          <div class="mb-3">
+            <span class="badge text-bg-primary mb-2" id="watch-type">Loading</span>
+            <h1 class="h3 mb-2" id="watch-title">Preparing stream...</h1>
+            <p class="text-secondary mb-0" id="watch-source"></p>
+          </div>
+          <p class="text-secondary flex-grow-1" id="watch-description">The player page loads stream details first and only requests the provider stream after you press play.</p>
+          <div class="player-link-box rounded-4 p-3 mb-3">
+            <label class="form-label small text-secondary mb-2" for="watch-stream-url">Direct stream URL</label>
+            <input class="form-control mb-2" id="watch-stream-url" type="text" readonly>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-primary btn-sm" type="button" id="watch-copy-url">Copy URL</button>
+            </div>
+          </div>
+          <div class="alert alert-info d-none mb-0" id="watch-message"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script
+    src="https://cdn.jsdelivr.net/npm/video.js@8.23.4/dist/video.min.js"
+    integrity="sha384-GK0UA/tBku6A4JblKlmFXkAtBuKfr8BbYGvrdgqmSkNbVQ1M7VfSRCZO75VUS/O6"
+    crossorigin="anonymous"
+  ></script>
+  <script type="module" src="{{ url_for('static', filename='js/watch.js') }}"></script>
+{% endblock %}

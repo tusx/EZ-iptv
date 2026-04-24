@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="d-flex flex-column gap-4">
+    <div class="alert alert-info d-none mb-0" id="settings-message"></div>
+
+    <section class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
+          <div>
+            <h1 class="h4 mb-1">Saved Sources</h1>
+            <p class="text-secondary mb-0">Sync status, quick actions, and source health all live here.</p>
+          </div>
+          <button class="btn btn-outline-primary" type="button" id="sync-all">Sync all enabled sources</button>
+        </div>
+        <div class="alert alert-secondary d-none" id="queue-status"></div>
+        <div class="row g-3" id="source-list"></div>
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h2 class="h4 mb-1">Add New Source</h2>
+            <p class="text-secondary mb-0">Add an M3U playlist or Xtream Codes connection for the library.</p>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm d-none" id="cancel-edit">Cancel edit</button>
+        </div>
+
+        <form id="source-form" class="needs-validation" novalidate>
+          <input type="hidden" id="source-id">
+
+          <div class="mb-3">
+            <label class="form-label" for="source-name">Display name</label>
+            <input class="form-control" id="source-name" required>
+            <div class="invalid-feedback">Please give this source a name.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="source-type">Source type</label>
+            <select class="form-select" id="source-type" required>
+              <option value="m3u">M3U playlist</option>
+              <option value="xtream">Xtream Codes</option>
+            </select>
+          </div>
+
+          <div class="mb-3" data-source-field="m3u">
+            <label class="form-label" for="m3u-url">Playlist URL</label>
+            <input class="form-control" id="m3u-url" placeholder="https://example.com/playlist.m3u8">
+          </div>
+
+          <div class="mb-3 d-none" data-source-field="xtream">
+            <label class="form-label" for="xtream-base-url">Xtream base URL</label>
+            <input class="form-control" id="xtream-base-url" placeholder="https://provider.example.com">
+          </div>
+
+          <div class="row g-3 d-none" data-source-field="xtream">
+            <div class="col-md-6">
+              <label class="form-label" for="xtream-username">Username</label>
+              <input class="form-control" id="xtream-username">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="xtream-password">Password</label>
+              <input class="form-control" id="xtream-password">
+            </div>
+          </div>
+
+          <div class="mt-3 mb-3">
+            <label class="form-label" for="user-agent">Custom user agent</label>
+            <input class="form-control" id="user-agent" placeholder="Optional">
+          </div>
+
+          <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" role="switch" id="source-enabled" checked>
+            <label class="form-check-label" for="source-enabled">Enabled</label>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary" type="submit" id="save-source">Save source</button>
+          </div>
+        </form>
+
+        <div class="alert alert-warning d-none mt-3 mb-0" id="source-create-lock-message">
+          New sources cannot be added while a sync is in progress. Please wait until the current sync has finished.
+        </div>
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-2">Background Sync</h2>
+        <p class="text-secondary small mb-3">Set how long provider fetch stages can run before they are marked stale. Parsing and replacing a large catalog will not time out.</p>
+        <div class="input-group">
+          <input class="form-control" id="sync-timeout-minutes" type="number" min="1" max="120" step="1">
+          <button class="btn btn-outline-primary" type="button" id="save-sync-settings">Save timeout</button>
+        </div>
+        <div class="form-text">Default is 10 minutes. The timeout only applies while fetching data from providers.</div>
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-2">Library Pagination</h2>
+        <p class="text-secondary small mb-3">Choose how many catalog results the library page should show on each page. This setting is saved for the whole app.</p>
+        <div class="input-group">
+          <input class="form-control" id="library-results-per-page" type="number" min="1" max="100" step="1">
+          <button class="btn btn-outline-primary" type="button" id="save-library-settings">Save page size</button>
+        </div>
+        <div class="form-text">Default is 20 results per page. The maximum is 100.</div>
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-2">Appearance</h2>
+        <p class="text-secondary small mb-3">Set the default color theme for the app. The navbar toggle also updates this saved preference immediately.</p>
+        <div class="input-group">
+          <select class="form-select" id="default-theme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+          <button class="btn btn-outline-primary" type="button" id="save-theme-settings">Save theme</button>
+        </div>
+        <div class="form-text">Dark mode is the default for first-time users.</div>
+      </div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="module" src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}
